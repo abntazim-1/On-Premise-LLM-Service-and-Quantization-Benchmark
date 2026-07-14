@@ -9,7 +9,7 @@ WORKDIR /app
 # Clone and build llama.cpp server
 RUN git clone https://github.com/ggerganov/llama.cpp.git && \
     cd llama.cpp && \
-    cmake -B build && cmake --build build --config Release -j --target llama-server
+    cmake -B build && cmake --build build --config Release -j 4 --target llama-server
 
 EXPOSE 8000
 

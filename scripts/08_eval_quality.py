@@ -42,7 +42,7 @@ def calculate_perplexity_gguf(model_path, dataset, limit=50):
     if not os.path.exists("llama.cpp/build/bin/llama-perplexity") and not os.path.exists("llama.cpp/build/llama-perplexity"):
         print("llama-perplexity binary not found. Building it...")
         subprocess.run(["cmake", "-B", "llama.cpp/build"], check=True)
-        subprocess.run(["cmake", "--build", "llama.cpp/build", "--config", "Release", "-j", "--target", "llama-perplexity"], check=True)
+        subprocess.run(["cmake", "--build", "llama.cpp/build", "--config", "Release", "-j", "4", "--target", "llama-perplexity"], check=True)
         
     text = "\n\n".join(dataset['text'][:limit])
     temp_file = "eval/wiki_temp.txt"

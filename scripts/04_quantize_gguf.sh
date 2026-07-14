@@ -28,7 +28,7 @@ if [ ! -d "llama.cpp" ]; then
     # Build the quantization tool
     echo "Building llama.cpp..."
     cmake -B build
-    cmake --build build --config Release -j
+    cmake --build build --config Release -j 2 --target llama-quantize
     # Install Python dependencies for the conversion script
     pip install -r requirements.txt
     cd ..
