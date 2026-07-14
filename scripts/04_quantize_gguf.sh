@@ -1,6 +1,7 @@
 #!/bin/bash
 # Exit on any error
 set -e
+cd "$(dirname "$0")/.."
 
 echo "=== GGUF Quantization Pipeline ==="
 

@@ -1,4 +1,5 @@
 import os
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import json
 import torch
 import argparse
@@ -52,7 +53,7 @@ def calculate_perplexity_gguf(model_path, dataset, limit=50):
     print(f"Shelling out to llama-perplexity for {model_path}...")
     try:
         cmd = ["./llama.cpp/llama-perplexity", "-m", model_path, "-f", temp_file]
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
         
         # Parse PPL from output. Format is usually "Final estimate: PPL = X.XX"
         output_lines = res.stdout.split('\n') + res.stderr.split('\n')

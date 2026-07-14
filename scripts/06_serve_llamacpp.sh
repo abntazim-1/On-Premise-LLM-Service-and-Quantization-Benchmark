@@ -2,6 +2,8 @@
 # Script to serve GGUF models via llama.cpp with OpenAI-compatible API
 # Usage: ./06_serve_llamacpp.sh [q4_k_m|q5_k_m|q8_0] [port]
 
+cd "$(dirname "$0")/.."
+
 LEVEL=${1:-q4_k_m}
 PORT=${2:-8000}
 

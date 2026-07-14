@@ -1,4 +1,5 @@
 import os
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import time
 import json
 import uuid
@@ -135,7 +136,8 @@ async def run_loadtest(concurrency, duration, prompts, config, variant, runtime,
     print(f"\n--- Starting test: {variant} on {runtime} at concurrency {concurrency} ---")
     model_name = config.get("model_name", "default_model")
     
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=120) # 2 minute timeout per request to prevent hanging
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         # 1. Warm-up Phase
         print("Warming up server (5 seconds) to compile CUDA graphs and init KV cache...")
         warmup_stop = asyncio.Event()

@@ -1,4 +1,5 @@
 import os
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import json
 import pandas as pd
 import matplotlib.pyplot as plt

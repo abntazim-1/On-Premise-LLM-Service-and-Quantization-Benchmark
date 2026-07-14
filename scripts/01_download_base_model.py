@@ -1,4 +1,5 @@
 import os
+os.chdir(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import yaml
 from huggingface_hub import snapshot_download
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline

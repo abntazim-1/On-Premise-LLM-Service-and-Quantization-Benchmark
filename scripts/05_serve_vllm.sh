@@ -2,6 +2,8 @@
 # Script to serve models via vLLM with OpenAI-compatible API
 # Usage: ./05_serve_vllm.sh [base|gptq|awq] [port]
 
+cd "$(dirname "$0")/.."
+
 VARIANT=${1:-base}
 PORT=${2:-8000}
 
