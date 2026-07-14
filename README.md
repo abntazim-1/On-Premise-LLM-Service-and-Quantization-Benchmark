@@ -38,9 +38,9 @@ graph TD
     B -->|llama.cpp| E(GGUF Q4/Q5/Q8)
     end
     
-    C --> F{vLLM Server\n(Docker)}
+    C --> F{"vLLM Server\n(Docker)"}
     D --> F
-    E --> G{llama-server\n(Docker)}
+    E --> G{"llama-server\n(Docker)"}
     
     F -->|OpenAI API| H[Async Load Tester\nConcurrency Sweeps]
     G -->|OpenAI API| H
