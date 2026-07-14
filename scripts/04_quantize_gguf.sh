@@ -27,7 +27,8 @@ if [ ! -d "llama.cpp" ]; then
     cd llama.cpp
     # Build the quantization tool
     echo "Building llama.cpp..."
-    make -j
+    cmake -B build
+    cmake --build build --config Release -j
     # Install Python dependencies for the conversion script
     pip install -r requirements.txt
     cd ..
@@ -56,7 +57,11 @@ for LEVEL in "${LEVELS[@]}"; do
     
     if [ ! -f "$OUT_PATH" ]; then
         echo "--> Quantizing to $LEVEL_UPPER..."
-        ./llama.cpp/llama-quantize "$FP16_GGUF" "$OUT_PATH" "$LEVEL_UPPER"
+        if [ -f "./llama.cpp/build/bin/llama-quantize" ]; then
+            ./llama.cpp/build/bin/llama-quantize "$FP16_GGUF" "$OUT_PATH" "$LEVEL_UPPER"
+        else
+            ./llama.cpp/build/llama-quantize "$FP16_GGUF" "$OUT_PATH" "$LEVEL_UPPER"
+        fi
     else
         echo "--> Quantized model $OUT_PATH already exists. Skipping."
     fi

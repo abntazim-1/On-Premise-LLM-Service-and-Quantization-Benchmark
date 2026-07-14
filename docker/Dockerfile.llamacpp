@@ -9,8 +9,8 @@ WORKDIR /app
 # Clone and build llama.cpp server
 RUN git clone https://github.com/ggerganov/llama.cpp.git && \
     cd llama.cpp && \
-    make -j llama-server
+    cmake -B build && cmake --build build --config Release -j --target llama-server
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/llama.cpp/llama-server"]
+ENTRYPOINT ["sh", "-c", "if [ -x /app/llama.cpp/build/bin/llama-server ]; then exec /app/llama.cpp/build/bin/llama-server \"$@\"; else exec /app/llama.cpp/build/llama-server \"$@\"; fi", "--"]

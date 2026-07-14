@@ -39,9 +39,10 @@ def calculate_perplexity_hf(model, tokenizer, dataset, max_length=512, limit=50)
 
 def calculate_perplexity_gguf(model_path, dataset, limit=50):
     """Uses llama.cpp's native perplexity tool."""
-    if not os.path.exists("llama.cpp/llama-perplexity"):
+    if not os.path.exists("llama.cpp/build/bin/llama-perplexity") and not os.path.exists("llama.cpp/build/llama-perplexity"):
         print("llama-perplexity binary not found. Building it...")
-        subprocess.run(["make", "-C", "llama.cpp", "llama-perplexity"], check=True)
+        subprocess.run(["cmake", "-B", "llama.cpp/build"], check=True)
+        subprocess.run(["cmake", "--build", "llama.cpp/build", "--config", "Release", "-j", "--target", "llama-perplexity"], check=True)
         
     text = "\n\n".join(dataset['text'][:limit])
     temp_file = "eval/wiki_temp.txt"
@@ -52,7 +53,8 @@ def calculate_perplexity_gguf(model_path, dataset, limit=50):
         
     print(f"Shelling out to llama-perplexity for {model_path}...")
     try:
-        cmd = ["./llama.cpp/llama-perplexity", "-m", model_path, "-f", temp_file]
+        bin_path = "./llama.cpp/build/bin/llama-perplexity" if os.path.exists("./llama.cpp/build/bin/llama-perplexity") else "./llama.cpp/build/llama-perplexity"
+        cmd = [bin_path, "-m", model_path, "-f", temp_file]
         res = subprocess.run(cmd, capture_output=True, text=True, check=True)
         
         # Parse PPL from output. Format is usually "Final estimate: PPL = X.XX"
@@ -139,7 +141,8 @@ def main():
                         outputs = model.generate(**inputs, max_new_tokens=150, do_sample=True, temperature=0.7)
                     answer = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
                 else:
-                    cmd = ["./llama.cpp/llama-cli", "-m", model_path, "-p", prompt, "-n", "150", "--log-disable"]
+                    bin_path = "./llama.cpp/build/bin/llama-cli" if os.path.exists("./llama.cpp/build/bin/llama-cli") else "./llama.cpp/build/llama-cli"
+                    cmd = [bin_path, "-m", model_path, "-p", prompt, "-n", "150", "--log-disable"]
                     try:
                         res = subprocess.run(cmd, capture_output=True, text=True)
                         answer = res.stdout.replace(prompt, "").strip()
