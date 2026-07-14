@@ -1,0 +1,5 @@
+concurrency_levels: [1, 4, 8, 16, 32]
+duration_seconds: 60
+prompts_file: "eval/task_prompts.jsonl"
+api_url: "http://localhost:8000/v1/completions"
+model_name: "default_model"

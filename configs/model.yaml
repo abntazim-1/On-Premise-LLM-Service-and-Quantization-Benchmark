@@ -1,0 +1,7 @@
+model:
+  id: "meta-llama/Llama-2-7b-hf"
+  revision: "main"
+quant_targets:
+  - "gptq"
+  - "awq"
+  - "gguf"
