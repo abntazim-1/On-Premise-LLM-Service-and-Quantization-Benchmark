@@ -8,3 +8,4 @@ results/charts/
 .env
 .venv
 venv/
+docs/
