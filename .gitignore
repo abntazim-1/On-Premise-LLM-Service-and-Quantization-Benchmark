@@ -1,0 +1,10 @@
+quantization-benchmark-enterprise-plan.md
+__pycache__/
+*.pyc
+models/
+results/raw/
+results/aggregated/
+results/charts/
+.env
+.venv
+venv/

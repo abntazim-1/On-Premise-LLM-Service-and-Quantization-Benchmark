@@ -1,0 +1,27 @@
+[project]
+name = "llm-quant-bench"
+version = "0.1.0"
+description = "On-Premise LLM Serving & Quantization Benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1.2",
+    "vllm>=0.4.0",
+    "auto-gptq>=0.7.1",
+    "autoawq>=0.1.8",
+    "llama-cpp-python>=0.2.56",
+    "huggingface-hub",
+    "transformers>=4.38.0",
+    "datasets",
+    "aiohttp",
+    "pyyaml",
+    "pandas",
+    "pyarrow",
+    "matplotlib",
+    "seaborn",
+    "psutil",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
