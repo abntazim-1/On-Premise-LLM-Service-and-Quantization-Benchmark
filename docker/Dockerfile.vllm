@@ -1,0 +1,17 @@
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
+
+# Install python and dependencies
+RUN apt-get update && apt-get install -y python3-pip python3-dev git && \
+    rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+WORKDIR /app
+
+# Copy requirements and install
+# We pin versions closely matching our pyproject.toml
+RUN pip install torch>=2.1.2 vllm>=0.4.0 auto-gptq>=0.7.1 autoawq>=0.1.8
+
+EXPOSE 8000
+
+# Entrypoint for the OpenAI compatible server
+ENTRYPOINT ["python", "-m", "vllm.entrypoints.openai.api_server"]
