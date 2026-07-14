@@ -111,6 +111,44 @@ def main():
             "perplexity_wikitext2": ppl
         }, f, indent=2)
     print(f"Saved metric to {out_file}")
+    
+    # Phase 5: Generate Human Grading Rubric using task prompts
+    prompts_file = "eval/task_prompts.jsonl"
+    if os.path.exists(prompts_file):
+        print("\nGenerating task responses for human grading rubric...")
+        prompts = []
+        with open(prompts_file, "r") as f:
+            for line in f:
+                if line.strip():
+                    prompts.append(json.loads(line)["text"])
+        
+        rubric_out = f"results/raw/rubric_eval_{args.variant}.md"
+        with open(rubric_out, "w", encoding="utf-8") as f:
+            f.write(f"# Human Grading Rubric for {args.variant}\n\n")
+            f.write("Score each prompt on a scale of 1-5 for accuracy, coherence, and instruction adherence.\n\n")
+            
+            for i, prompt in enumerate(prompts):
+                print(f"Generating prompt {i+1}/{len(prompts)}...")
+                f.write(f"## Prompt {i+1}\n**Q**: {prompt}\n\n")
+                
+                answer = ""
+                if args.variant in ["fp16", "base", "gptq", "awq"]:
+                    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+                    with torch.no_grad():
+                        outputs = model.generate(**inputs, max_new_tokens=150, do_sample=True, temperature=0.7)
+                    answer = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+                else:
+                    cmd = ["./llama.cpp/llama-cli", "-m", model_path, "-p", prompt, "-n", "150", "--log-disable"]
+                    try:
+                        res = subprocess.run(cmd, capture_output=True, text=True)
+                        answer = res.stdout.replace(prompt, "").strip()
+                    except Exception as e:
+                        answer = f"[Error generating response: {e}]"
+                
+                f.write(f"**A**: {answer}\n\n")
+                f.write(f"**Score (1-5)**: ___\n\n---\n")
+                
+        print(f"Saved human grading rubric to {rubric_out}")
 
 if __name__ == "__main__":
     main()

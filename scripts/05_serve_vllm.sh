@@ -29,12 +29,16 @@ if [ ! -d "$MODEL_PATH" ]; then
     exit 1
 fi
 
-echo "Starting vLLM server for $VARIANT model on port $PORT..."
-echo "Command: python -m vllm.entrypoints.openai.api_server --model $MODEL_PATH $QUANT_FLAG --port $PORT"
+echo "Building vLLM docker image (if not exists)..."
+docker build -t vllm-server -f docker/Dockerfile.vllm .
 
-# Run vLLM's OpenAI-compatible server
-python -m vllm.entrypoints.openai.api_server \
-    --model "$MODEL_PATH" \
-    $QUANT_FLAG \
-    --port "$PORT" \
+echo "Starting vLLM Docker container for $VARIANT model on port $PORT..."
+echo "Command: docker run --rm --gpus all -v $(pwd)/models:/app/models -p $PORT:8000 vllm-server ..."
+
+docker run --rm --gpus all \
+    -v "$(pwd)/models:/app/models" \
+    -p "$PORT:8000" \
+    vllm-server \
+    --model "/app/$MODEL_PATH" $QUANT_FLAG \
+    --port 8000 \
     --host 0.0.0.0

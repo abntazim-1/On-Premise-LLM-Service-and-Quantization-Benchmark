@@ -14,19 +14,19 @@ if [ ! -f "$MODEL_PATH" ]; then
     exit 1
 fi
 
-if [ ! -f "llama.cpp/llama-server" ]; then
-    echo "llama-server executable not found. Attempting to build it..."
-    cd llama.cpp
-    make -j llama-server
-    cd ..
-fi
+echo "Building llama.cpp docker image..."
+docker build -t llamacpp-server -f docker/Dockerfile.llamacpp .
 
-echo "Starting llama.cpp server for GGUF $LEVEL_UPPER on port $PORT..."
-echo "Command: ./llama.cpp/llama-server -m $MODEL_PATH --port $PORT --host 0.0.0.0 -c 2048"
+echo "Starting llama.cpp Docker container for GGUF $LEVEL_UPPER on port $PORT..."
+echo "Command: docker run --rm -v $(pwd)/models:/app/models -p $PORT:8000 llamacpp-server ..."
 
-# Run llama.cpp's built-in server which is OpenAI API compatible
-./llama.cpp/llama-server \
-    -m "$MODEL_PATH" \
-    --port "$PORT" \
+docker run --rm \
+    -v "$(pwd)/models:/app/models" \
+    -p "$PORT:8000" \
+    llamacpp-server \
+    -m "/app/$MODEL_PATH" \
+    --port 8000 \
     --host 0.0.0.0 \
     -c 2048
+
+

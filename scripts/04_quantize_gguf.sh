@@ -8,6 +8,12 @@ MODEL_DIR="models/base_model"
 GGUF_DIR="models/gguf"
 mkdir -p "$GGUF_DIR"
 
+if ! command -v make &> /dev/null || ! command -v g++ &> /dev/null; then
+    echo "Error: 'make' and 'g++' are required to build llama.cpp."
+    echo "Please install build-essential (e.g., 'sudo apt install build-essential') and try again."
+    exit 1
+fi
+
 if [ ! -d "$MODEL_DIR" ]; then
     echo "Error: Base model not found at $MODEL_DIR. Run the download script first."
     exit 1
