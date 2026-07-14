@@ -20,7 +20,10 @@ jobs:
           
       - name: Install dependencies
         run: |
-          pip install -e .
+          # Install CPU torch to save time and prevent CUDA compilation errors on the CPU runner
+          pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
+          # Install remaining dependencies required for downloading and GGUF quantization
+          pip install transformers huggingface_hub pyyaml datasets psutil aiohttp pandas pyarrow matplotlib seaborn
           
       - name: Verify shell scripts are executable
         run: |
