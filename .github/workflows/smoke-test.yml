@@ -30,3 +30,19 @@ jobs:
         run: |
           pip install flake8
           flake8 scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run End-to-End Pipeline on Tiny Model (Smoke Test)
+        run: |
+          # Override configs for a fast CI test
+          echo "model:" > configs/model.yaml
+          echo "  id: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'" >> configs/model.yaml
+          echo "  revision: 'main'" >> configs/model.yaml
+          echo "quant_targets:" >> configs/model.yaml
+          echo "  - 'gguf'" >> configs/model.yaml
+          
+          echo "quant_levels:" > configs/quant_gguf.yaml
+          echo "  - 'q4_k_m'" >> configs/quant_gguf.yaml
+          
+          # Run the CPU-compatible parts of the pipeline
+          make download
+          make quantize-gguf
