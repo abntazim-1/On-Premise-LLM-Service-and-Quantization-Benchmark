@@ -19,10 +19,13 @@ fi
 echo "Building llama.cpp docker image..."
 docker build -t llamacpp-server -f docker/Dockerfile.llamacpp .
 
-echo "Starting llama.cpp Docker container for GGUF $LEVEL_UPPER on port $PORT..."
-echo "Command: docker run --rm -v $(pwd)/models:/app/models -p $PORT:8000 llamacpp-server ..."
+# Clean up any existing benchmark server container
+echo "Stopping any existing benchmark server container..."
+docker stop llm-benchmark-server 2>/dev/null || true
+docker rm llm-benchmark-server 2>/dev/null || true
 
-docker run --rm \
+echo "Starting llama.cpp Docker container for GGUF $LEVEL_UPPER on port $PORT..."
+docker run -d --name llm-benchmark-server \
     -v "$(pwd)/models:/app/models" \
     -p "$PORT:8000" \
     llamacpp-server \
@@ -30,5 +33,34 @@ docker run --rm \
     --port 8000 \
     --host 0.0.0.0 \
     -c 2048
+
+echo "Waiting for llama.cpp server to start and load the GGUF model (timeout: 60s)..."
+timeout=60
+elapsed=0
+while [ $elapsed -lt $timeout ]; do
+    # Check if container is running
+    if ! docker ps -q --filter name=llm-benchmark-server > /dev/null; then
+        echo "Error: Container crashed during startup."
+        docker logs llm-benchmark-server
+        exit 1
+    fi
+
+    # Query OpenAI compatibility models endpoint
+    if curl -s http://localhost:$PORT/v1/models > /dev/null; then
+        echo "llama.cpp server is up and running on port $PORT!"
+        break
+    fi
+    sleep 2
+    elapsed=$((elapsed + 2))
+    echo "Waiting... (${elapsed}s elapsed)"
+done
+
+if [ $elapsed -ge $timeout ]; then
+    echo "Error: Server failed to respond within $timeout seconds."
+    docker logs llm-benchmark-server
+    docker stop llm-benchmark-server
+    exit 1
+fi
+
 
 

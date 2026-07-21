@@ -45,7 +45,16 @@ jobs:
           
           echo "quant_levels:" > configs/quant_gguf.yaml
           echo "  - 'q4_k_m'" >> configs/quant_gguf.yaml
+
+          # Speed up the loadtest for CI smoke test
+          echo "concurrency_levels: [1, 2]" > configs/loadtest.yaml
+          echo "duration_seconds: 5" >> configs/loadtest.yaml
+          echo "prompts_file: 'eval/task_prompts.jsonl'" >> configs/loadtest.yaml
+          echo "api_url: 'http://localhost:8000/v1/completions'" >> configs/loadtest.yaml
+          echo "model_name: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'" >> configs/loadtest.yaml
           
           # Run the CPU-compatible parts of the pipeline
           make download
           make quantize-gguf
+          python scripts/run_benchmarks.py
+

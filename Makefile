@@ -39,4 +39,5 @@ eval:
 aggregate:
 	python scripts/09_aggregate_results.py
 
-bench-all: download quantize-gptq quantize-awq quantize-gguf serve-vllm loadtest eval aggregate
+bench-all: download quantize-gptq quantize-awq quantize-gguf
+	python scripts/run_benchmarks.py

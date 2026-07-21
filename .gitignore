@@ -9,3 +9,5 @@ results/charts/
 .venv
 venv/
 docs/
+test_llama_cpp/
+
